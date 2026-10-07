@@ -1,0 +1,3487 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+>
+
+<title>Task Tracker</title>
+
+
+<style>
+
+/* =========================================================
+   RESET
+========================================================= */
+
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+html,
+body {
+    margin: 0;
+    width: 100%;
+    min-height: 100%;
+}
+
+body {
+
+    background: #f5f5f7;
+
+    color: #1d1d1f;
+
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "SF Pro Display",
+        "SF Pro Text",
+        "Helvetica Neue",
+        Arial,
+        sans-serif;
+
+    overflow-x: hidden;
+
+    -webkit-touch-callout: none;
+}
+
+button,
+input {
+
+    font: inherit;
+}
+
+button {
+
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+
+/* =========================================================
+   APP
+========================================================= */
+
+.app {
+
+    width: 100%;
+    min-height: 100vh;
+
+    padding:
+        28px
+        24px
+        calc(50px + env(safe-area-inset-bottom));
+
+}
+
+
+/* =========================================================
+   SETUP SCREEN
+========================================================= */
+
+.setup-screen {
+
+    width: min(1100px, 100%);
+
+    margin: 0 auto;
+
+}
+
+
+.setup-header {
+
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    margin-bottom: 30px;
+
+}
+
+
+.setup-title {
+
+    margin: 0;
+
+    font-size: 38px;
+
+    font-weight: 750;
+
+    letter-spacing: -0.045em;
+
+}
+
+
+.setup-subtitle {
+
+    margin: 7px 0 0;
+
+    color: #8e8e93;
+
+    font-size: 14px;
+
+}
+
+
+/* =========================================================
+   ADD BUTTON
+========================================================= */
+
+.add-button {
+
+    width: 48px;
+    height: 48px;
+
+    border: none;
+
+    border-radius: 50%;
+
+    background: white;
+
+    color: #1d1d1f;
+
+    font-size: 29px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    box-shadow:
+        0 2px 9px rgba(0,0,0,.08);
+
+    cursor: pointer;
+
+    transition:
+        transform .15s ease;
+
+}
+
+.add-button:active {
+
+    transform: scale(.91);
+
+}
+
+
+/* =========================================================
+   SETUP CONTENT
+========================================================= */
+
+.setup-section {
+
+    margin-bottom: 30px;
+
+}
+
+
+.section-heading {
+
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    margin-bottom: 12px;
+
+}
+
+
+.section-title {
+
+    margin: 0;
+
+    color: #777;
+
+    font-size: 13px;
+
+    font-weight: 650;
+
+}
+
+
+/* =========================================================
+   BULK DELETE
+========================================================= */
+
+.delete-completed-button {
+
+    border: none;
+
+    padding: 6px 10px;
+
+    border-radius: 9px;
+
+    background: #ffe5e5;
+
+    color: #ff3b30;
+
+    font-size: 11px;
+
+    font-weight: 650;
+
+    cursor: pointer;
+
+    transition:
+        opacity .15s ease,
+        transform .15s ease;
+
+}
+
+.delete-completed-button:active {
+
+    transform: scale(.96);
+
+}
+
+.delete-completed-button:disabled {
+
+    opacity: .35;
+
+    cursor: default;
+
+}
+
+
+/* =========================================================
+   TASK MANAGEMENT GRID
+========================================================= */
+
+.management-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+    gap: 12px;
+
+}
+
+
+/* =========================================================
+   MANAGEMENT TASK
+========================================================= */
+
+.management-task {
+
+    min-height: 76px;
+
+    padding: 13px 14px;
+
+    background: white;
+
+    border-radius: 17px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    box-shadow:
+        0 1px 5px rgba(0,0,0,.05);
+
+}
+
+
+.management-name {
+
+    flex: 1;
+
+    min-width: 0;
+
+    font-size: 15px;
+
+    line-height: 1.35;
+
+    word-break: break-word;
+
+}
+
+
+.management-name.completed {
+
+    color: #999;
+
+    text-decoration: line-through;
+
+}
+
+
+.management-type {
+
+    margin-top: 3px;
+
+    color: #999;
+
+    font-size: 10px;
+
+}
+
+
+.management-status {
+
+    flex: 0 0 auto;
+
+    padding: 5px 7px;
+
+    border-radius: 8px;
+
+    background: #eaf8ee;
+
+    color: #34c759;
+
+    font-size: 9px;
+
+    font-weight: 700;
+
+    white-space: nowrap;
+
+}
+
+
+.management-delete {
+
+    width: 31px;
+    height: 31px;
+
+    flex: 0 0 31px;
+
+    border: none;
+
+    border-radius: 50%;
+
+    background: #f1f1f3;
+
+    color: #999;
+
+    font-size: 17px;
+
+    cursor: pointer;
+
+}
+
+
+/* =========================================================
+   EMPTY MANAGEMENT
+========================================================= */
+
+.management-empty {
+
+    grid-column: 1 / -1;
+
+    padding: 35px 20px;
+
+    text-align: center;
+
+    color: #999;
+
+    background: white;
+
+    border-radius: 18px;
+
+    line-height: 1.6;
+
+}
+
+
+/* =========================================================
+   MODE SELECTOR
+========================================================= */
+
+.mode-selector {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, 1fr);
+
+    gap: 12px;
+
+}
+
+
+.mode-choice {
+
+    position: relative;
+
+    min-height: 105px;
+
+    padding: 18px;
+
+    border: 2px solid transparent;
+
+    border-radius: 20px;
+
+    background: white;
+
+    color: #1d1d1f;
+
+    text-align: left;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 1px 5px rgba(0,0,0,.05);
+
+    transition:
+        border-color .2s ease,
+        background .2s ease,
+        transform .15s ease;
+
+}
+
+
+.mode-choice:active {
+
+    transform: scale(.98);
+
+}
+
+
+.mode-choice.selected {
+
+    border-color: #007aff;
+
+    background: #f0f7ff;
+
+}
+
+
+.mode-choice-title {
+
+    font-size: 17px;
+
+    font-weight: 700;
+
+}
+
+
+.mode-choice-description {
+
+    margin-top: 6px;
+
+    color: #888;
+
+    font-size: 12px;
+
+    line-height: 1.4;
+
+}
+
+
+.mode-choice-check {
+
+    position: absolute;
+
+    top: 14px;
+    right: 14px;
+
+    width: 22px;
+    height: 22px;
+
+    border-radius: 50%;
+
+    background: #007aff;
+
+    color: white;
+
+    display: none;
+
+    align-items: center;
+    justify-content: center;
+
+    font-size: 13px;
+
+    font-weight: 700;
+
+}
+
+
+.mode-choice.selected .mode-choice-check {
+
+    display: flex;
+
+}
+
+
+/* =========================================================
+   START BUTTON
+========================================================= */
+
+.start-button {
+
+    width: 100%;
+
+    margin-top: 28px;
+
+    padding: 16px;
+
+    border: none;
+
+    border-radius: 16px;
+
+    background: #007aff;
+
+    color: white;
+
+    font-size: 17px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 4px 12px rgba(0,122,255,.2);
+
+    transition:
+        transform .15s ease,
+        opacity .15s ease;
+
+}
+
+
+.start-button:active {
+
+    transform: scale(.985);
+
+}
+
+
+.start-button:disabled {
+
+    opacity: .45;
+
+    cursor: default;
+
+}
+
+
+/* =========================================================
+   RUNNING SCREEN
+========================================================= */
+
+.running-screen {
+
+    display: none;
+
+    position: relative;
+
+    width: 100%;
+
+    min-height: calc(
+        100vh - 78px
+    );
+
+}
+
+
+.running-screen.active {
+
+    display: block;
+
+}
+
+
+/* =========================================================
+   EXIT BUTTON
+========================================================= */
+
+.exit-button {
+
+    position: fixed;
+
+    top:
+        calc(
+            16px +
+            env(safe-area-inset-top)
+        );
+
+    right: 20px;
+
+    z-index: 100;
+
+    width: 36px;
+    height: 36px;
+
+    border: none;
+
+    border-radius: 50%;
+
+    background: rgba(255,255,255,.9);
+
+    color: #888;
+
+    font-size: 18px;
+
+    box-shadow:
+        0 2px 8px rgba(0,0,0,.08);
+
+    cursor: pointer;
+
+}
+
+
+/* =========================================================
+   RUNNING TASK GRID
+========================================================= */
+
+.running-grid {
+
+    width: 100%;
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+    gap: 20px;
+
+    padding:
+        30px 0
+        40px;
+
+}
+
+
+/* =========================================================
+   RUNNING LIST TASK
+========================================================= */
+
+.running-list-task {
+
+    position: relative;
+
+    min-height: 90px;
+
+    padding: 15px;
+
+    background: white;
+
+    border-radius: 20px;
+
+    display: flex;
+
+    align-items: center;
+
+    overflow: hidden;
+
+    box-shadow:
+        0 1px 5px rgba(0,0,0,.05);
+
+    touch-action: none;
+
+    cursor: pointer;
+
+    transition:
+        transform .2s ease,
+        background .25s ease;
+
+}
+
+
+/*
+   長押し中の進捗リング。
+   カード全体の外周を時計回りに塗る。
+*/
+
+.running-list-task::before {
+
+    content: "";
+
+    position: absolute;
+
+    inset: 0;
+
+    padding: 3px;
+
+    border-radius: inherit;
+
+    background:
+        conic-gradient(
+            from -90deg,
+            #34c759 0deg,
+            #34c759 calc(var(--hold-progress, 0) * 360deg),
+            transparent calc(var(--hold-progress, 0) * 360deg),
+            transparent 360deg
+        );
+
+    -webkit-mask:
+        linear-gradient(#000 0 0) content-box,
+        linear-gradient(#000 0 0);
+
+    -webkit-mask-composite: xor;
+
+    mask:
+        linear-gradient(#000 0 0) content-box,
+        linear-gradient(#000 0 0);
+
+    mask-composite: exclude;
+
+    pointer-events: none;
+
+    opacity: 1;
+
+}
+
+
+/*
+   カードの中身を上に重ねる
+*/
+
+.running-list-task > * {
+
+    position: relative;
+
+    z-index: 2;
+
+}
+
+
+.running-list-task.completed {
+
+    background: #f8f8f8;
+
+}
+
+
+.running-list-information {
+
+    flex: 1;
+
+    min-width: 0;
+
+}
+
+
+.running-list-name {
+
+    font-size: 16px;
+
+    line-height: 1.35;
+
+    word-break: break-word;
+
+    transition:
+        color .25s ease;
+
+}
+
+
+.running-list-task.completed
+.running-list-name {
+
+    color: #999;
+
+    text-decoration: line-through;
+
+}
+
+
+.running-list-type {
+
+    margin-top: 4px;
+
+    color: #999;
+
+    font-size: 10px;
+
+}
+
+
+/* =========================================================
+   LIST COMPLETION MARK
+========================================================= */
+
+.list-completed-mark {
+
+    width: 40px;
+    height: 40px;
+
+    flex: 0 0 40px;
+
+    margin-right: 12px;
+
+    border-radius: 50%;
+
+    background: #34c759;
+
+    color: white;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    font-size: 21px;
+
+    font-weight: 700;
+
+    opacity: 0;
+
+    transform: scale(.65);
+
+    transition:
+        opacity .25s ease,
+        transform .3s cubic-bezier(
+            .2,
+            .8,
+            .2,
+            1
+        );
+
+}
+
+
+.running-list-task.completed
+.list-completed-mark {
+
+    opacity: 1;
+
+    transform: scale(1);
+
+}
+
+
+/* =========================================================
+   STREAKS GRID
+========================================================= */
+
+.streak-grid {
+
+    width: 100%;
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+    gap: 30px;
+
+    padding:
+        35px 0
+        45px;
+
+}
+
+
+/* =========================================================
+   STREAK ITEM
+========================================================= */
+
+.streak-item {
+
+    width: 100%;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    position: relative;
+
+}
+
+
+/* =========================================================
+   STREAK CIRCLE
+========================================================= */
+
+.streak-circle {
+
+    position: relative;
+
+    width: min(
+        100%,
+        300px
+    );
+
+    aspect-ratio: 1 / 1;
+
+    padding: 0;
+
+    border: none;
+
+    border-radius: 50%;
+
+    background: transparent;
+
+    overflow: hidden;
+
+    touch-action: none;
+
+    user-select: none;
+    -webkit-user-select: none;
+
+    cursor: pointer;
+
+}
+
+
+/* =========================================================
+   OUTER BORDER
+========================================================= */
+
+.streak-border {
+
+    position: absolute;
+
+    inset: 0;
+
+    border-radius: 50%;
+
+    border: 7px solid #dedee3;
+
+    z-index: 10;
+
+    pointer-events: none;
+
+    transition:
+        border-color .25s ease,
+        transform .25s ease;
+
+}
+
+
+/* =========================================================
+   FILL
+========================================================= */
+
+.streak-fill {
+
+    position: absolute;
+
+    inset: 7px;
+
+    border-radius: 50%;
+
+    overflow: hidden;
+
+    z-index: 1;
+
+    pointer-events: none;
+
+    background: transparent;
+
+}
+
+
+.streak-fill::after {
+
+    content: "";
+
+    position: absolute;
+
+    inset: 0;
+
+    border-radius: 50%;
+
+}
+
+
+/* =========================================================
+   INNER
+========================================================= */
+
+.streak-inner {
+
+    position: absolute;
+
+    inset: 16px;
+
+    border-radius: 50%;
+
+    background: white;
+
+    z-index: 5;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 35px;
+
+    pointer-events: none;
+
+    transition:
+        background .25s ease,
+        transform .3s ease;
+
+}
+
+
+.streak-label {
+
+    color: #1d1d1f;
+
+    font-size: clamp(
+        17px,
+        2.3vw,
+        27px
+    );
+
+    font-weight: 700;
+
+    line-height: 1.25;
+
+    text-align: center;
+
+    letter-spacing: -0.025em;
+
+    word-break: break-word;
+
+    transition:
+        opacity .2s ease,
+        transform .25s ease;
+
+}
+
+
+/* =========================================================
+   CHECK
+========================================================= */
+
+.streak-check {
+
+    position: absolute;
+
+    left: 50%;
+    top: 50%;
+
+    z-index: 20;
+
+    transform:
+        translate(-50%, -50%)
+        scale(.4);
+
+    color: white;
+
+    font-size: clamp(
+        70px,
+        8vw,
+        110px
+    );
+
+    line-height: 1;
+
+    font-weight: 700;
+
+    opacity: 0;
+
+    pointer-events: none;
+
+    transition:
+        opacity .2s ease,
+        transform .35s cubic-bezier(
+            .2,
+            .8,
+            .2,
+            1
+        );
+
+}
+
+
+/* =========================================================
+   COMPLETED STREAK
+========================================================= */
+
+.streak-circle.completed
+.streak-border {
+
+    border-color: #34c759;
+
+}
+
+
+.streak-circle.completed
+.streak-inner {
+
+    background: #34c759;
+
+    transform: scale(.985);
+
+}
+
+
+.streak-circle.completed
+.streak-label {
+
+    opacity: 0;
+
+    transform: scale(.8);
+
+}
+
+
+.streak-circle.completed
+.streak-check {
+
+    opacity: 1;
+
+    transform:
+        translate(-50%, -50%)
+        scale(1);
+
+}
+
+
+/* =========================================================
+   EMPTY RUNNING
+========================================================= */
+
+.running-empty {
+
+    grid-column: 1 / -1;
+
+    padding: 70px 20px;
+
+    text-align: center;
+
+    color: #999;
+
+    line-height: 1.7;
+
+}
+
+
+/* =========================================================
+   MODAL
+========================================================= */
+
+.modal-background {
+
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 1000;
+
+    display: none;
+
+    align-items: flex-end;
+    justify-content: center;
+
+    background:
+        rgba(0,0,0,.45);
+
+}
+
+
+.modal-background.show {
+
+    display: flex;
+
+}
+
+
+.modal {
+
+    width: min(
+        760px,
+        100%
+    );
+
+    padding:
+        23px
+        20px
+        calc(
+            23px +
+            env(safe-area-inset-bottom)
+        );
+
+    background: white;
+
+    border-radius:
+        25px
+        25px
+        0
+        0;
+
+    animation:
+        modalUp .25s ease;
+
+}
+
+
+@keyframes modalUp {
+
+    from {
+
+        transform:
+            translateY(30px);
+
+        opacity: 0;
+
+    }
+
+    to {
+
+        transform:
+            translateY(0);
+
+        opacity: 1;
+
+    }
+
+}
+
+
+.modal-title {
+
+    margin:
+        0 0 20px;
+
+    font-size: 21px;
+
+}
+
+
+.label {
+
+    display: block;
+
+    margin-bottom: 7px;
+
+    color: #888;
+
+    font-size: 13px;
+
+}
+
+
+.task-input {
+
+    width: 100%;
+
+    padding: 13px;
+
+    border:
+        1px solid #d2d2d7;
+
+    border-radius: 12px;
+
+    outline: none;
+
+    background: #f8f8fa;
+
+    font-size: 16px;
+
+    -webkit-user-select: text;
+    user-select: text;
+
+}
+
+
+.task-input:focus {
+
+    border-color: #007aff;
+
+    background: white;
+
+}
+
+
+.type-container {
+
+    display: flex;
+
+    gap: 8px;
+
+    margin-top: 16px;
+
+}
+
+
+.type-option {
+
+    flex: 1;
+
+    padding: 12px;
+
+    border:
+        1px solid #d2d2d7;
+
+    border-radius: 12px;
+
+    text-align: center;
+
+    color: #777;
+
+    cursor: pointer;
+
+}
+
+
+.type-option input {
+
+    display: none;
+
+}
+
+
+.type-option.selected {
+
+    border-color: #007aff;
+
+    background: #f0f7ff;
+
+    color: #007aff;
+
+}
+
+
+.modal-buttons {
+
+    display: flex;
+
+    gap: 10px;
+
+    margin-top: 20px;
+
+}
+
+
+.modal-buttons button {
+
+    flex: 1;
+
+    padding: 13px;
+
+    border: none;
+
+    border-radius: 13px;
+
+    font-weight: 650;
+
+    cursor: pointer;
+
+}
+
+
+.cancel-button {
+
+    background: #e5e5ea;
+
+}
+
+
+.confirm-button {
+
+    background: #007aff;
+
+    color: white;
+
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 700px) {
+
+    .app {
+
+        padding-left: 15px;
+        padding-right: 15px;
+
+    }
+
+    .setup-title {
+
+        font-size: 32px;
+
+    }
+
+    .management-grid {
+
+        gap: 9px;
+
+    }
+
+    .management-task {
+
+        min-height: 70px;
+
+        padding:
+            11px 10px;
+
+    }
+
+    .management-name {
+
+        font-size: 13px;
+
+    }
+
+    .running-grid {
+
+        gap: 10px;
+
+    }
+
+    .running-list-task {
+
+        min-height: 80px;
+
+        padding: 10px;
+
+        border-radius: 16px;
+
+    }
+
+    .running-list-name {
+
+        font-size: 13px;
+
+    }
+
+    .list-completed-mark {
+
+        width: 36px;
+        height: 36px;
+
+        flex-basis: 36px;
+
+        margin-right: 9px;
+
+    }
+
+    .streak-grid {
+
+        gap: 14px;
+
+    }
+
+    .streak-circle {
+
+        width: 100%;
+
+    }
+
+    .streak-inner {
+
+        inset: 10px;
+
+        padding: 16px;
+
+    }
+
+    .streak-border {
+
+        border-width: 5px;
+
+    }
+
+    .streak-fill {
+
+        inset: 5px;
+
+    }
+
+}
+
+
+@media (max-width: 430px) {
+
+    .setup-header {
+
+        margin-bottom: 22px;
+
+    }
+
+    .setup-title {
+
+        font-size: 29px;
+
+    }
+
+    .setup-subtitle {
+
+        font-size: 12px;
+
+    }
+
+    .add-button {
+
+        width: 43px;
+        height: 43px;
+
+    }
+
+    .management-grid {
+
+        gap: 7px;
+
+    }
+
+    .management-task {
+
+        min-height: 66px;
+
+        padding:
+            9px 8px;
+
+        border-radius: 13px;
+
+    }
+
+    .management-name {
+
+        font-size: 12px;
+
+    }
+
+    .management-status {
+
+        padding:
+            4px 5px;
+
+        font-size: 8px;
+
+    }
+
+    .management-delete {
+
+        width: 26px;
+        height: 26px;
+
+        flex-basis: 26px;
+
+        font-size: 15px;
+
+    }
+
+    .running-grid {
+
+        gap: 7px;
+
+        padding-top: 55px;
+
+    }
+
+    .running-list-task {
+
+        min-height: 72px;
+
+        padding: 8px;
+
+        border-radius: 13px;
+
+    }
+
+    .running-list-information {
+
+        margin-left: 3px;
+
+    }
+
+    .running-list-name {
+
+        font-size: 11px;
+
+    }
+
+    .running-list-type {
+
+        font-size: 8px;
+
+    }
+
+    .list-completed-mark {
+
+        width: 29px;
+        height: 29px;
+
+        flex-basis: 29px;
+
+        margin-right: 5px;
+
+        font-size: 15px;
+
+    }
+
+    .streak-grid {
+
+        gap: 7px;
+
+        padding-top: 60px;
+
+    }
+
+    .streak-border {
+
+        border-width: 4px;
+
+    }
+
+    .streak-fill {
+
+        inset: 4px;
+
+    }
+
+    .streak-inner {
+
+        inset: 8px;
+
+        padding: 9px;
+
+    }
+
+    .streak-label {
+
+        font-size: 13px;
+
+    }
+
+}
+
+
+/* =========================================================
+   LARGE DISPLAY
+========================================================= */
+
+@media (min-width: 1000px) {
+
+    .streak-grid {
+
+        gap: 35px;
+
+    }
+
+    .streak-circle {
+
+        max-width: 330px;
+
+    }
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<div class="app">
+
+
+<!-- =======================================================
+     SETUP SCREEN
+======================================================== -->
+
+<section
+    class="setup-screen"
+    id="setupScreen"
+>
+
+
+    <header class="setup-header">
+
+        <div>
+
+            <h1 class="setup-title">
+                Today
+            </h1>
+
+            <p class="setup-subtitle">
+                タスクを準備して、今日を始めよう。
+            </p>
+
+        </div>
+
+
+        <button
+            class="add-button"
+            id="addButton"
+            aria-label="タスクを追加"
+        >
+            ＋
+        </button>
+
+    </header>
+
+
+    <!-- ===================================================
+         TASK MANAGEMENT
+    ==================================================== -->
+
+    <section class="setup-section">
+
+        <div class="section-heading">
+
+            <h2 class="section-title">
+                タスク
+            </h2>
+
+            <button
+                class="delete-completed-button"
+                id="deleteCompletedButton"
+            >
+                完了済みを削除
+            </button>
+
+        </div>
+
+
+        <div
+            class="management-grid"
+            id="managementGrid"
+        ></div>
+
+    </section>
+
+
+    <!-- ===================================================
+         MODE
+    ==================================================== -->
+
+    <section class="setup-section">
+
+        <h2 class="section-title">
+            表示方法
+        </h2>
+
+
+        <div class="mode-selector">
+
+
+            <button
+                class="mode-choice selected"
+                data-mode="list"
+            >
+
+                <span
+                    class="mode-choice-title"
+                >
+                    リスト
+                </span>
+
+
+                <div
+                    class="mode-choice-description"
+                >
+                    タスクを3列のリストで表示
+                </div>
+
+
+                <span
+                    class="mode-choice-check"
+                >
+                    ✓
+                </span>
+
+            </button>
+
+
+            <button
+                class="mode-choice"
+                data-mode="streaks"
+            >
+
+                <span
+                    class="mode-choice-title"
+                >
+                    Streaks
+                </span>
+
+
+                <div
+                    class="mode-choice-description"
+                >
+                    大きな円でタスクを表示
+                </div>
+
+
+                <span
+                    class="mode-choice-check"
+                >
+                    ✓
+                </span>
+
+            </button>
+
+
+        </div>
+
+    </section>
+
+
+    <!-- ===================================================
+         START
+    ==================================================== -->
+
+    <button
+        class="start-button"
+        id="startButton"
+    >
+        開始
+    </button>
+
+
+</section>
+
+
+
+<!-- =======================================================
+     RUNNING SCREEN
+======================================================== -->
+
+<section
+    class="running-screen"
+    id="runningScreen"
+>
+
+
+    <button
+        class="exit-button"
+        id="exitButton"
+        aria-label="終了"
+    >
+        ×
+    </button>
+
+
+    <main
+        id="runningContainer"
+    ></main>
+
+
+</section>
+
+
+</div>
+
+
+
+<!-- =========================================================
+     ADD MODAL
+========================================================= -->
+
+<div
+    class="modal-background"
+    id="modalBackground"
+>
+
+    <form
+        class="modal"
+        id="taskForm"
+    >
+
+
+        <h2 class="modal-title">
+            タスクを追加
+        </h2>
+
+
+        <label class="label">
+            タスク名
+        </label>
+
+
+        <input
+            class="task-input"
+            id="taskInput"
+            type="text"
+            maxlength="100"
+            placeholder="例：英単語を30個"
+            autocomplete="off"
+        >
+
+
+        <label
+            class="label"
+            style="margin-top:18px;"
+        >
+            種類
+        </label>
+
+
+        <div class="type-container">
+
+
+            <label class="type-option selected">
+
+                <input
+                    type="radio"
+                    name="taskType"
+                    value="today"
+                    checked
+                >
+
+                今日すること
+
+            </label>
+
+
+            <label class="type-option">
+
+                <input
+                    type="radio"
+                    name="taskType"
+                    value="habit"
+                >
+
+                習慣
+
+            </label>
+
+
+        </div>
+
+
+        <div class="modal-buttons">
+
+
+            <button
+                type="button"
+                class="cancel-button"
+                id="cancelButton"
+            >
+                キャンセル
+            </button>
+
+
+            <button
+                type="submit"
+                class="confirm-button"
+            >
+                追加
+            </button>
+
+
+        </div>
+
+
+    </form>
+
+</div>
+
+
+
+<script>
+
+/* =========================================================
+   SETTINGS
+========================================================= */
+
+const STORAGE_KEY =
+    "my-task-tracker";
+
+const HOLD_TIME =
+    800;
+
+
+/* =========================================================
+   STATE
+========================================================= */
+
+let tasks = [];
+
+let selectedMode =
+    "list";
+
+let runningMode =
+    null;
+
+let holding =
+    false;
+
+let holdAnimation =
+    null;
+
+let currentHoldElement =
+    null;
+
+let currentTaskId =
+    null;
+
+
+/* =========================================================
+   STORAGE
+========================================================= */
+
+function loadTasks() {
+
+    try {
+
+        const saved =
+            localStorage.getItem(
+                STORAGE_KEY
+            );
+
+        tasks =
+            saved
+                ? JSON.parse(saved)
+                : [];
+
+    } catch {
+
+        tasks = [];
+
+    }
+
+}
+
+
+function saveTasks() {
+
+    localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify(tasks)
+    );
+
+}
+
+
+/* =========================================================
+   DATE
+========================================================= */
+
+function getToday() {
+
+    const date =
+        new Date();
+
+    return (
+        date.getFullYear() +
+        "-" +
+        String(
+            date.getMonth() + 1
+        ).padStart(2, "0") +
+        "-" +
+        String(
+            date.getDate()
+        ).padStart(2, "0")
+    );
+
+}
+
+
+/* =========================================================
+   HABIT RESET
+========================================================= */
+
+function resetHabits() {
+
+    const today =
+        getToday();
+
+    let changed =
+        false;
+
+
+    tasks.forEach(task => {
+
+        if (
+            task.type === "habit" &&
+            task.completed === true &&
+            task.completedDate !== today
+        ) {
+
+            task.completed =
+                false;
+
+            task.completedDate =
+                null;
+
+            changed =
+                true;
+
+        }
+
+    });
+
+
+    if (changed) {
+
+        saveTasks();
+
+    }
+
+}
+
+
+/* =========================================================
+   ESCAPE HTML
+========================================================= */
+
+function escapeHTML(text) {
+
+    return String(text)
+
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+
+}
+
+
+/* =========================================================
+   MANAGEMENT
+========================================================= */
+
+function renderManagement() {
+
+    const grid =
+        document.getElementById(
+            "managementGrid"
+        );
+
+    const bulkDeleteButton =
+        document.getElementById(
+            "deleteCompletedButton"
+        );
+
+
+    if (tasks.length === 0) {
+
+        grid.innerHTML = `
+
+            <div class="management-empty">
+
+                まだタスクがありません。<br>
+
+                「＋」からタスクを追加してください。
+
+            </div>
+
+        `;
+
+        document
+            .getElementById("startButton")
+            .disabled = true;
+
+        bulkDeleteButton.disabled = true;
+
+        return;
+
+    }
+
+
+    document
+        .getElementById("startButton")
+        .disabled = false;
+
+
+    const completedTodayTasks =
+        tasks.filter(task =>
+            task.type === "today" &&
+            task.completed === true
+        );
+
+
+    bulkDeleteButton.disabled =
+        completedTodayTasks.length === 0;
+
+
+    grid.innerHTML = `
+
+        ${tasks.map(task => `
+
+            <div class="management-task">
+
+                <div
+                    class="management-name ${
+                        task.completed
+                            ? "completed"
+                            : ""
+                    }"
+                >
+
+                    ${escapeHTML(task.name)}
+
+                    <div
+                        class="management-type"
+                    >
+
+                        ${
+                            task.type === "habit"
+                                ? "習慣"
+                                : "今日すること"
+                        }
+
+                    </div>
+
+                </div>
+
+
+                ${
+                    task.completed
+                        ? `
+                            <div
+                                class="management-status"
+                            >
+                                完了済み
+                            </div>
+                        `
+                        : ""
+                }
+
+
+                <button
+                    class="management-delete"
+                    data-management-delete="${task.id}"
+                    aria-label="削除"
+                >
+                    ×
+                </button>
+
+            </div>
+
+        `).join("")}
+
+    `;
+
+
+    document
+        .querySelectorAll(
+            "[data-management-delete]"
+        )
+        .forEach(button => {
+
+            button.addEventListener(
+                "click",
+                event => {
+
+                    event.preventDefault();
+
+                    event.stopPropagation();
+
+                    deleteTask(
+                        button.dataset.managementDelete
+                    );
+
+                }
+            );
+
+        });
+
+}
+
+
+/* =========================================================
+   DELETE COMPLETED TODAY TASKS
+========================================================= */
+
+document
+    .getElementById(
+        "deleteCompletedButton"
+    )
+    .addEventListener(
+        "click",
+        deleteCompletedTodayTasks
+    );
+
+
+function deleteCompletedTodayTasks() {
+
+    const completed =
+        tasks.filter(task =>
+            task.type === "today" &&
+            task.completed === true
+        );
+
+
+    if (completed.length === 0) {
+
+        return;
+
+    }
+
+
+    if (
+        !confirm(
+            `${completed.length}件の完了済みタスクを削除しますか？`
+        )
+    ) {
+
+        return;
+
+    }
+
+
+    tasks =
+        tasks.filter(task =>
+            !(
+                task.type === "today" &&
+                task.completed === true
+            )
+        );
+
+
+    saveTasks();
+
+    renderManagement();
+
+}
+
+
+/* =========================================================
+   MODE SELECTION
+========================================================= */
+
+document
+    .querySelectorAll(
+        ".mode-choice"
+    )
+    .forEach(button => {
+
+        button.addEventListener(
+            "click",
+            () => {
+
+                selectedMode =
+                    button.dataset.mode;
+
+
+                document
+                    .querySelectorAll(
+                        ".mode-choice"
+                    )
+                    .forEach(item => {
+
+                        item.classList.remove(
+                            "selected"
+                        );
+
+                    });
+
+
+                button.classList.add(
+                    "selected"
+                );
+
+            }
+        );
+
+    });
+
+
+/* =========================================================
+   START
+========================================================= */
+
+document
+    .getElementById("startButton")
+    .addEventListener(
+        "click",
+        startSession
+    );
+
+
+function startSession() {
+
+    if (tasks.length === 0) {
+
+        return;
+
+    }
+
+
+    runningMode =
+        selectedMode;
+
+
+    document
+        .getElementById(
+            "setupScreen"
+        )
+        .style.display =
+            "none";
+
+
+    document
+        .getElementById(
+            "runningScreen"
+        )
+        .classList.add(
+            "active"
+        );
+
+
+    renderRunning();
+
+}
+
+
+/* =========================================================
+   EXIT
+========================================================= */
+
+document
+    .getElementById("exitButton")
+    .addEventListener(
+        "click",
+        exitSession
+    );
+
+
+function exitSession() {
+
+    stopHolding();
+
+
+    document
+        .getElementById(
+            "runningScreen"
+        )
+        .classList.remove(
+            "active"
+        );
+
+
+    document
+        .getElementById(
+            "setupScreen"
+        )
+        .style.display =
+            "";
+
+
+    renderManagement();
+
+}
+
+
+/* =========================================================
+   RUNNING RENDER
+========================================================= */
+
+function renderRunning() {
+
+    resetHabits();
+
+
+    const container =
+        document.getElementById(
+            "runningContainer"
+        );
+
+
+    if (tasks.length === 0) {
+
+        container.innerHTML = `
+
+            <div class="running-grid">
+
+                <div class="running-empty">
+
+                    タスクがありません。
+
+                </div>
+
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    if (runningMode === "streaks") {
+
+        renderRunningStreaks(
+            container
+        );
+
+    } else {
+
+        renderRunningList(
+            container
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   RUNNING LIST
+========================================================= */
+
+function renderRunningList(
+    container
+) {
+
+    container.innerHTML = `
+
+        <div class="running-grid">
+
+            ${tasks.map(task => `
+
+                <div
+                    class="running-list-task ${
+                        task.completed
+                            ? "completed"
+                            : ""
+                    }"
+                    data-hold="${task.id}"
+                    aria-label="${escapeHTML(task.name)}"
+                >
+
+                    ${
+                        task.completed
+                            ? `
+                                <div
+                                    class="list-completed-mark"
+                                >
+                                    ✓
+                                </div>
+                            `
+                            : `
+                                <div
+                                    class="list-completed-mark"
+                                >
+                                    ✓
+                                </div>
+                            `
+                    }
+
+
+                    <div
+                        class="running-list-information"
+                    >
+
+                        <div
+                            class="running-list-name"
+                        >
+                            ${escapeHTML(task.name)}
+                        </div>
+
+
+                        <div
+                            class="running-list-type"
+                        >
+
+                            ${
+                                task.type === "habit"
+                                    ? "習慣"
+                                    : "今日すること"
+                            }
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            `).join("")}
+
+        </div>
+
+    `;
+
+
+    setupHoldButtons();
+
+}
+
+
+/* =========================================================
+   RUNNING STREAKS
+========================================================= */
+
+function renderRunningStreaks(
+    container
+) {
+
+    container.innerHTML = `
+
+        <div class="streak-grid">
+
+            ${tasks.map(task => `
+
+                <div class="streak-item">
+
+                    <button
+                        class="streak-circle ${
+                            task.completed
+                                ? "completed"
+                                : ""
+                        }"
+                        data-hold="${task.id}"
+                        aria-label="${escapeHTML(task.name)}"
+                    >
+
+                        <span
+                            class="streak-border"
+                        ></span>
+
+
+                        <span
+                            class="streak-fill"
+                        ></span>
+
+
+                        <span
+                            class="streak-inner"
+                        >
+
+                            <span
+                                class="streak-label"
+                            >
+                                ${escapeHTML(task.name)}
+                            </span>
+
+                        </span>
+
+
+                        <span
+                            class="streak-check"
+                        >
+                            ✓
+                        </span>
+
+                    </button>
+
+                </div>
+
+            `).join("")}
+
+        </div>
+
+    `;
+
+
+    document
+        .querySelectorAll(
+            ".streak-circle.completed"
+        )
+        .forEach(button => {
+
+            updateStreakFill(
+                button,
+                1
+            );
+
+        });
+
+
+    setupHoldButtons();
+
+}
+
+
+/* =========================================================
+   HOLD EVENTS
+========================================================= */
+
+function setupHoldButtons() {
+
+    document
+        .querySelectorAll(
+            "[data-hold]"
+        )
+        .forEach(element => {
+
+            element.addEventListener(
+                "pointerdown",
+                startHold,
+                {
+                    passive: false
+                }
+            );
+
+
+            element.addEventListener(
+                "pointerup",
+                cancelHold,
+                {
+                    passive: false
+                }
+            );
+
+
+            element.addEventListener(
+                "pointercancel",
+                cancelHold,
+                {
+                    passive: false
+                }
+            );
+
+
+            element.addEventListener(
+                "contextmenu",
+                event => {
+
+                    event.preventDefault();
+
+                }
+            );
+
+        });
+
+}
+
+
+/* =========================================================
+   START HOLD
+========================================================= */
+
+function startHold(event) {
+
+    event.preventDefault();
+
+    event.stopPropagation();
+
+
+    if (holding) {
+
+        return;
+
+    }
+
+
+    holding =
+        true;
+
+
+    currentHoldElement =
+        event.currentTarget;
+
+
+    currentTaskId =
+        currentHoldElement.dataset.hold;
+
+
+    try {
+
+        currentHoldElement.setPointerCapture(
+            event.pointerId
+        );
+
+    } catch {
+
+        // Ignore
+
+    }
+
+
+    const task =
+        tasks.find(
+            item =>
+                item.id ===
+                currentTaskId
+        );
+
+
+    if (!task) {
+
+        stopHolding();
+
+        return;
+
+    }
+
+
+    const reverse =
+        task.completed;
+
+
+    const isStreak =
+        currentHoldElement.classList.contains(
+            "streak-circle"
+        );
+
+
+    const startTime =
+        performance.now();
+
+
+    function animate(now) {
+
+        if (!holding) {
+
+            return;
+
+        }
+
+
+        const elapsed =
+            now -
+            startTime;
+
+
+        const raw =
+            Math.min(
+                elapsed / HOLD_TIME,
+                1
+            );
+
+
+        const progress =
+            reverse
+                ? 1 - raw
+                : raw;
+
+
+        if (isStreak) {
+
+            updateStreakFill(
+                currentHoldElement,
+                progress
+            );
+
+        } else {
+
+            updateListCardProgress(
+                currentHoldElement,
+                progress
+            );
+
+        }
+
+
+        if (raw >= 1) {
+
+            holding =
+                false;
+
+
+            holdAnimation =
+                null;
+
+
+            finishTask(
+                currentTaskId
+            );
+
+
+            currentHoldElement =
+                null;
+
+            currentTaskId =
+                null;
+
+            return;
+
+        }
+
+
+        holdAnimation =
+            requestAnimationFrame(
+                animate
+            );
+
+    }
+
+
+    holdAnimation =
+        requestAnimationFrame(
+            animate
+        );
+
+}
+
+
+/* =========================================================
+   LIST CARD PROGRESS
+========================================================= */
+
+function updateListCardProgress(
+    element,
+    progress
+) {
+
+    if (!element) {
+
+        return;
+
+    }
+
+
+    const safeProgress =
+        Math.max(
+            0,
+            Math.min(
+                1,
+                progress
+            )
+        );
+
+
+    element.style.setProperty(
+        "--hold-progress",
+        safeProgress
+    );
+
+}
+
+
+/* =========================================================
+   STREAK PROGRESS
+========================================================= */
+
+function updateStreakFill(
+    button,
+    progress
+) {
+
+    const fill =
+        button.querySelector(
+            ".streak-fill"
+        );
+
+
+    if (!fill) {
+
+        return;
+
+    }
+
+
+    const degrees =
+        Math.max(
+            0,
+            Math.min(
+                360,
+                progress * 360
+            )
+        );
+
+
+    fill.style.background =
+        `conic-gradient(
+            from -90deg,
+            #34c759 0deg,
+            #34c759 ${degrees}deg,
+            transparent ${degrees}deg,
+            transparent 360deg
+        )`;
+
+}
+
+
+/* =========================================================
+   RESET HOLD VISUAL
+========================================================= */
+
+function resetHoldVisual() {
+
+    if (!currentHoldElement) {
+
+        return;
+
+    }
+
+
+    const task =
+        tasks.find(
+            item =>
+                item.id ===
+                currentTaskId
+        );
+
+
+    if (!task) {
+
+        return;
+
+    }
+
+
+    const isStreak =
+        currentHoldElement.classList.contains(
+            "streak-circle"
+        );
+
+
+    if (isStreak) {
+
+        updateStreakFill(
+            currentHoldElement,
+            task.completed
+                ? 1
+                : 0
+        );
+
+    } else {
+
+        updateListCardProgress(
+            currentHoldElement,
+            task.completed
+                ? 1
+                : 0
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   CANCEL HOLD
+========================================================= */
+
+function cancelHold(event) {
+
+    if (!holding) {
+
+        return;
+
+    }
+
+
+    if (event) {
+
+        event.preventDefault();
+
+        event.stopPropagation();
+
+    }
+
+
+    resetHoldVisual();
+
+
+    stopHolding();
+
+}
+
+
+/* =========================================================
+   STOP HOLD
+========================================================= */
+
+function stopHolding() {
+
+    holding =
+        false;
+
+
+    if (
+        holdAnimation !== null
+    ) {
+
+        cancelAnimationFrame(
+            holdAnimation
+        );
+
+        holdAnimation =
+            null;
+
+    }
+
+
+    currentHoldElement =
+        null;
+
+    currentTaskId =
+        null;
+
+}
+
+
+/* =========================================================
+   FINISH TASK
+========================================================= */
+
+function finishTask(id) {
+
+    const task =
+        tasks.find(
+            item =>
+                item.id === id
+        );
+
+
+    if (!task) {
+
+        return;
+
+    }
+
+
+    task.completed =
+        !task.completed;
+
+
+    if (task.completed) {
+
+        task.completedDate =
+            getToday();
+
+    } else {
+
+        task.completedDate =
+            null;
+
+    }
+
+
+    saveTasks();
+
+
+    renderRunning();
+
+}
+
+
+/* =========================================================
+   DELETE TASK
+========================================================= */
+
+function deleteTask(id) {
+
+    if (
+        !confirm(
+            "このタスクを削除しますか？"
+        )
+    ) {
+
+        return;
+
+    }
+
+
+    tasks =
+        tasks.filter(
+            task =>
+                task.id !== id
+        );
+
+
+    saveTasks();
+
+
+    renderManagement();
+
+
+    if (
+        document
+            .getElementById(
+                "runningScreen"
+            )
+            .classList.contains(
+                "active"
+            )
+    ) {
+
+        if (tasks.length === 0) {
+
+            exitSession();
+
+        } else {
+
+            renderRunning();
+
+        }
+
+    }
+
+}
+
+
+/* =========================================================
+   MODAL
+========================================================= */
+
+const modalBackground =
+    document.getElementById(
+        "modalBackground"
+    );
+
+const addButton =
+    document.getElementById(
+        "addButton"
+    );
+
+const cancelButton =
+    document.getElementById(
+        "cancelButton"
+    );
+
+const taskForm =
+    document.getElementById(
+        "taskForm"
+    );
+
+const taskInput =
+    document.getElementById(
+        "taskInput"
+    );
+
+
+/* =========================================================
+   CLOSE MODAL
+========================================================= */
+
+function closeModal() {
+
+    modalBackground.classList.remove(
+        "show"
+    );
+
+    taskInput.blur();
+
+}
+
+
+/* =========================================================
+   OPEN MODAL
+========================================================= */
+
+addButton.addEventListener(
+    "click",
+    () => {
+
+        modalBackground.classList.add(
+            "show"
+        );
+
+
+        setTimeout(
+            () => {
+
+                taskInput.focus();
+
+            },
+            100
+        );
+
+    }
+);
+
+
+/* =========================================================
+   CANCEL
+========================================================= */
+
+cancelButton.addEventListener(
+    "click",
+    event => {
+
+        event.preventDefault();
+
+        event.stopPropagation();
+
+        closeModal();
+
+    }
+);
+
+
+/* =========================================================
+   BACKGROUND CLOSE
+========================================================= */
+
+modalBackground.addEventListener(
+    "click",
+    event => {
+
+        if (
+            event.target ===
+            modalBackground
+        ) {
+
+            closeModal();
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   TYPE SELECTOR
+========================================================= */
+
+document
+    .querySelectorAll(
+        ".type-option"
+    )
+    .forEach(option => {
+
+        option.addEventListener(
+            "click",
+            () => {
+
+                document
+                    .querySelectorAll(
+                        ".type-option"
+                    )
+                    .forEach(item => {
+
+                        item.classList.remove(
+                            "selected"
+                        );
+
+                    });
+
+
+                option.classList.add(
+                    "selected"
+                );
+
+
+                option
+                    .querySelector(
+                        "input"
+                    )
+                    .checked =
+                        true;
+
+            }
+        );
+
+    });
+
+
+/* =========================================================
+   ADD TASK
+========================================================= */
+
+taskForm.addEventListener(
+    "submit",
+    event => {
+
+        event.preventDefault();
+
+
+        const name =
+            taskInput.value.trim();
+
+
+        if (!name) {
+
+            return;
+
+        }
+
+
+        const selected =
+            document.querySelector(
+                'input[name="taskType"]:checked'
+            );
+
+
+        const type =
+            selected
+                ? selected.value
+                : "today";
+
+
+        const task = {
+
+            id:
+                Date.now()
+                .toString(36) +
+                Math.random()
+                    .toString(36)
+                    .slice(2),
+
+            name:
+                name,
+
+            type:
+                type,
+
+            completed:
+                false,
+
+            completedDate:
+                null
+
+        };
+
+
+        tasks.push(
+            task
+        );
+
+
+        saveTasks();
+
+
+        taskInput.value =
+            "";
+
+
+        closeModal();
+
+
+        renderManagement();
+
+    }
+);
+
+
+/* =========================================================
+   ESCAPE KEY
+========================================================= */
+
+document.addEventListener(
+    "keydown",
+    event => {
+
+        if (
+            event.key === "Escape" &&
+            modalBackground.classList.contains(
+                "show"
+            )
+        ) {
+
+            closeModal();
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   PREVENT LONG-PRESS SELECTION
+========================================================= */
+
+document.addEventListener(
+    "selectstart",
+    event => {
+
+        if (
+            event.target.closest(
+                "[data-hold]"
+            )
+        ) {
+
+            event.preventDefault();
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   INITIALIZE
+========================================================= */
+
+loadTasks();
+
+resetHabits();
+
+renderManagement();
+
+</script>
+
+</body>
+</html>
